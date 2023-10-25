@@ -18,7 +18,7 @@ curl --location 'http://localhost:8090/publish/sync?subject=sync.get.credentials
 
 CURL para la invocación asincronica:
 
-curl --location 'http://localhost:8090/publish/sync?subject=async.create.user&url=nats%3A%2F%2Flocalhost%3A4222' \
+curl --location 'http://localhost:8090/publish/async?subject=async.create.user&url=nats%3A%2F%2Flocalhost%3A4222' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name": "aaa bbb",
