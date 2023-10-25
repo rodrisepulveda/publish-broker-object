@@ -48,7 +48,7 @@ public class PublishController {
 			return ResponseEntity.ok(response);
 
 		} catch (IOException | InterruptedException error) {
-			log.error("Error publishing async message. ", error);
+			log.error("Error publishing sync message. ", error);
 			return ResponseEntity.internalServerError().build();
 		}
 
