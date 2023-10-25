@@ -53,12 +53,14 @@ public class PublishService {
 		jetStream.publish(subject, jsonAwtoRequest.getBytes());
 
 	}
-	
+
 	public String publishSyncMessage(String message, String subject, String url)
 			throws IOException, InterruptedException {
 
+		connect(url);
+
 		int timeOutInSeconds = 5;
-		Message msg = this.connection.request(subject, message, Duration.ofSeconds(timeOutInSeconds));
+		Message msg = this.connection.request(subject, message.getBytes(), Duration.ofSeconds(timeOutInSeconds));
 
 		if (msg == null) {
 			System.out.println("Response is null (timeout " + timeOutInSeconds + " seconds)");
