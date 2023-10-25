@@ -59,8 +59,13 @@ public class PublishService {
 
 		connect(url);
 
+		AwtoRequest awtoRequest = createAwtoRequest(message);
+
+		String jsonAwtoRequest = gson.toJson(awtoRequest);
+
 		int timeOutInSeconds = 5;
-		Message msg = this.connection.request(subject, message.getBytes(), Duration.ofSeconds(timeOutInSeconds));
+		Message msg = this.connection.request(subject, jsonAwtoRequest.getBytes(),
+				Duration.ofSeconds(timeOutInSeconds));
 
 		if (msg == null) {
 			System.out.println("Response is null (timeout " + timeOutInSeconds + " seconds)");
@@ -69,6 +74,11 @@ public class PublishService {
 
 		byte[] data = msg.getData();
 		return new String(data);
+	}
+
+	private AwtoRequest createAwtoRequest(String message) {
+		AwtoRequest awtoRequest = AwtoRequest.builder().data(message).build();
+		return awtoRequest;
 	}
 
 }
