@@ -1,6 +1,7 @@
 package testing.publish.service;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import org.springframework.stereotype.Service;
 
@@ -9,6 +10,7 @@ import com.google.gson.Gson;
 import io.nats.client.Connection;
 import io.nats.client.JetStream;
 import io.nats.client.JetStreamApiException;
+import io.nats.client.Message;
 import io.nats.client.Nats;
 import io.nats.client.Options;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +37,7 @@ public class PublishService {
 
 	}
 
-	public void publicAsyncMessage(String message, String subject, String url)
+	public void publishAsyncMessage(String message, String subject, String url)
 			throws IOException, JetStreamApiException, InterruptedException {
 
 		connect(url);
@@ -50,6 +52,21 @@ public class PublishService {
 
 		jetStream.publish(subject, jsonAwtoRequest.getBytes());
 
+	}
+	
+	public String publishSyncMessage(String message, String subject, String url)
+			throws IOException, InterruptedException {
+
+		int timeOutInSeconds = 5;
+		Message msg = this.connection.request(subject, message, Duration.ofSeconds(timeOutInSeconds));
+
+		if (msg == null) {
+			System.out.println("Response is null (timeout " + timeOutInSeconds + " seconds)");
+			return null;
+		}
+
+		byte[] data = msg.getData();
+		return new String(data);
 	}
 
 }

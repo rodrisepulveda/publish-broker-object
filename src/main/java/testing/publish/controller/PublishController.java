@@ -22,24 +22,34 @@ public class PublishController {
 	@Autowired
 	private PublishService publishService;
 
+	@PostMapping("/async")
+	public ResponseEntity<String> publishAsync(@RequestBody String message, @RequestParam("subject") String subject,
+			@RequestParam("url") String url) {
+
+		try {
+			log.info(message);
+			publishService.publishAsyncMessage(message, subject, url);
+			return ResponseEntity.ok("ok");
+
+		} catch (IOException | JetStreamApiException | InterruptedException error) {
+			log.error("Error publishing async message. ", error);
+			return ResponseEntity.internalServerError().build();
+		}
+
+	}
+
 	@PostMapping("/sync")
 	public ResponseEntity<String> publishSync(@RequestBody String message, @RequestParam("subject") String subject,
 			@RequestParam("url") String url) {
 
 		try {
-
 			log.info(message);
+			String response = publishService.publishSyncMessage(message, subject, url);
+			return ResponseEntity.ok(response);
 
-			publishService.publicAsyncMessage(message, subject, url);
-
-			return ResponseEntity.ok("ok");
-
-		} catch (IOException | JetStreamApiException | InterruptedException error) {
-
+		} catch (IOException | InterruptedException error) {
 			log.error("Error publishing async message. ", error);
-
 			return ResponseEntity.internalServerError().build();
-
 		}
 
 	}
