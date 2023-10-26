@@ -2,6 +2,8 @@ package testing.publish.service;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -20,29 +22,32 @@ import testing.publish.model.AwtoRequest;
 @Slf4j
 public class PublishService {
 
-	private Connection connection;
+	private Map<String, Connection> connetionsMap = new HashMap<>();
 
 	private Gson gson = new Gson();
 
-	private void connect(String url) throws IOException, InterruptedException {
+	private Connection getConnection(String url) throws IOException, InterruptedException {
 
-		if (this.connection != null) {
+		Connection connection = connetionsMap.get(url);
 
-			return;
+		if (connection == null) {
+
+			Options options = new Options.Builder().server(url).build();
+
+			connection = Nats.connect(options);
+
+			connetionsMap.put(url, connection);
+
 		}
 
-		Options options = new Options.Builder().server(url).build();
-
-		this.connection = Nats.connect(options);
+		return connection;
 
 	}
 
 	public void publishAsyncMessage(String message, String subject, String url)
 			throws IOException, JetStreamApiException, InterruptedException {
 
-		connect(url);
-
-		JetStream jetStream = this.connection.jetStream();
+		JetStream jetStream = this.getConnection(url).jetStream();
 
 		AwtoRequest awtoRequest = AwtoRequest.builder().data(message).build();
 
@@ -57,14 +62,12 @@ public class PublishService {
 	public String publishSyncMessage(String message, String subject, String url)
 			throws IOException, InterruptedException {
 
-		connect(url);
-
 		AwtoRequest awtoRequest = createAwtoRequest(message);
 
 		String jsonAwtoRequest = gson.toJson(awtoRequest);
 
 		int timeOutInSeconds = 5;
-		Message msg = this.connection.request(subject, jsonAwtoRequest.getBytes(),
+		Message msg = this.getConnection(url).request(subject, jsonAwtoRequest.getBytes(),
 				Duration.ofSeconds(timeOutInSeconds));
 
 		if (msg == null) {
