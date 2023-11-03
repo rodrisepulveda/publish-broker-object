@@ -3,6 +3,7 @@ package testing.publish.controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import io.nats.client.JetStreamApiException;
 import lombok.extern.slf4j.Slf4j;
+import testing.publish.exception.PublishMessageException;
 import testing.publish.service.PublishService;
 
 @Controller
@@ -47,9 +49,9 @@ public class PublishController {
 			String response = publishService.publishSyncMessage(message, subject, url);
 			return ResponseEntity.ok(response);
 
-		} catch (IOException | InterruptedException error) {
+		} catch (IOException | InterruptedException | PublishMessageException error) {
 			log.error("Error publishing sync message. ", error);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(error.getMessage());
 		}
 
 	}
