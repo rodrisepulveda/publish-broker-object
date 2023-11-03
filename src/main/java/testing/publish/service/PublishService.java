@@ -75,10 +75,10 @@ public class PublishService {
 				Duration.ofSeconds(this.responseTimeOutMessagesSeconds));
 
 		if (msg == null) {
-			String errorMessage = "Response is null (timeout " + this.responseTimeOutMessagesSeconds + " seconds)";
+			String errorMessage = "Message Publisher Error, Response is null (timeout "
+					+ this.responseTimeOutMessagesSeconds + " seconds)";
 			log.error(errorMessage);
-			throw new PublishMessageException(
-					"Response is null (timeout " + this.responseTimeOutMessagesSeconds + " seconds)");
+			throw new PublishMessageException(errorMessage);
 		}
 
 		byte[] data = msg.getData();
