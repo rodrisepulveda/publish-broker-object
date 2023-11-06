@@ -3,7 +3,7 @@ package testing.publish.controller;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +35,7 @@ public class PublishController {
 
 		} catch (IOException | JetStreamApiException | InterruptedException error) {
 			log.error("Error publishing async message. ", error);
-			return ResponseEntity.internalServerError().build();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error.getMessage());
 		}
 
 	}
@@ -51,7 +51,7 @@ public class PublishController {
 
 		} catch (IOException | InterruptedException | PublishMessageException error) {
 			log.error("Error publishing sync message. ", error);
-			return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(error.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error.getMessage());
 		}
 
 	}
